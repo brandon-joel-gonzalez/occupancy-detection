@@ -23,7 +23,7 @@ Adafruit_AMG88xx amg;
 float pixels[AMG88xx_PIXEL_ARRAY_SIZE];
 
 void setup() {
-    Serial.begin(115200);
+    Serial.begin(9600);
     
     // default settings
     amg.begin();
