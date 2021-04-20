@@ -45,6 +45,6 @@ void loop()
   } 
   // end print with return
   Serial.println();
-  // short delay between sends
-  delay(50);
+  // delay between sends
+  delay(5000);
 }
