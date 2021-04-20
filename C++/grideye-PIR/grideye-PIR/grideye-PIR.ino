@@ -34,60 +34,52 @@ int pirValue;
 int triggerGrideye = 0;
 
 void setup() {
-    Serial.begin(9600);
-//    Serial.println(F("GRIDEYE TEST"));
+  Serial.begin(9600);
+  //    Serial.println(F("GRIDEYE TEST"));
 
-    bool status;
-    
-    // default settings
-    amg.begin();
-    
-//    Serial.println("-- Pixels Test --");
+  bool status;
 
-//    Serial.println();
+  // default settings
+  amg.begin();
 
-    // Setup LEDs as Outputs
-    pinMode(led_pin, OUTPUT);
-    // Setup PIR as Input
-    pinMode(pir_pin, INPUT);
+  // Setup LEDs as Outputs
+  pinMode(led_pin, OUTPUT);
+  // Setup PIR as Input
+  pinMode(pir_pin, INPUT);
 
-    digitalWrite(led_pin, HIGH);
-    delay(300); // let sensors boot up
-    digitalWrite(led_pin, LOW);
-//    Serial.println("Ready!");
+  digitalWrite(led_pin, HIGH);
+  delay(5000); // let sensors boot up
+  digitalWrite(led_pin, LOW);
 }
 
 void loop() {
-//    // wait for PIR to detect something - this line breaks the MATLAB reader
-//    while (digitalRead(pir_pin) == 0 && triggerGrideye == 0);// { Serial.println("No motion."); }
-//
-//    // first time PIR detects movement
-//    if (triggerGrideye == 0) {
-//      // Display Triggered LED for 3 seconds
-//      digitalWrite(led_pin, HIGH);
-////      Serial.println("Detected!");
-//      triggerGrideye = 1;
-//      
-//      delay(300);
-//      digitalWrite(led_pin, LOW);
-////      Serial.println("Begin grideye!");
-//    } else {
-      readGrideye(); // otherwise, look for grideye data
-//    }
+  // wait for PIR to detect something
+  while (digitalRead(pir_pin) == 0 && triggerGrideye == 0);
+
+  // first time PIR detects movement
+  if (triggerGrideye == 0) {
+    // display LED for 1 second to signal motion detection
+    digitalWrite(led_pin, HIGH);
+    triggerGrideye = 1;
+    delay(1000);
+    digitalWrite(led_pin, LOW);
+  } else {
+    readGrideye(); // ready to send grideye data
+  }
 }
 
-void readGrideye() {
+  void readGrideye() {
     // read grideye data
     amg.readPixels(pixels);
-    
+
     // Print the temperature of each pixel
-    for(unsigned char i = 0; i < 64; i++)
+    for (unsigned char i = 0; i < 64; i++)
     {
       Serial.print(pixels[i]);
       Serial.print(",");
-    } 
+    }
     // end print with return
     Serial.println();
-    // short delay between sends
+    // 5sec delay between sends
     delay(5000);
-}
+  }
