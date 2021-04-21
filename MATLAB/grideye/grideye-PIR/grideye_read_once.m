@@ -14,6 +14,7 @@ data_grid = grideye_read(s)
 
 % process interpolated data to extract blobs
 num_people = people_counting(data_grid);
+disp(num_people)
 
 %[x_locs,y_locs] = meshgrid(1:8);
 %[x_interp,y_interp] = meshgrid(1:0.03:8-.07); % interpolate 8x8 to 231x231

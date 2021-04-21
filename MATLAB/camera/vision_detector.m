@@ -11,6 +11,7 @@ image = snapshot(cam);
 
 % process and label
 bboxBody = bodyDetector(image);
+num_people = size(bboxBody, 1);
 IBody = insertObjectAnnotation(image,'rectangle',bboxBody,'Upper Body');
 figure
 imshow(IBody)
