@@ -216,9 +216,6 @@ function pplcount_gui()
                 
                 
             end
-            % hardcode gating/alloc/cfar
-            a = 0
-            
     %         fclose(hControlSerialPort);
     %         delete(hControlSerialPort);
         end
@@ -377,9 +374,6 @@ function pplcount_gui()
             % SNR Threshold - 1000
             % Points Threshold - 100
             % Gating Gain - 10
-            
-            cfgData.cfar{1};
-            cfgData.cfar{2}
             
             %CFAR Range
             valStr = cfgData.cfar{1};
@@ -1195,7 +1189,7 @@ function [sphandle] = configureDataSport(comPortNum, bufferSize)
         delete(instrfind('Type','serial'));  % delete open serial ports.
     end
     comPortString = ['COM' num2str(comPortNum)];
-    sphandle = serial('/dev/ttyUSB1','BaudRate',921600); % hardcoded to '/dev/ttyUSB*'
+    sphandle = serial('/dev/ttyUSB3','BaudRate',921600); % hardcoded to '/dev/ttyUSB*'
     set(sphandle,'Terminator', '');
     set(sphandle,'InputBufferSize', bufferSize);
     set(sphandle,'Timeout',10);
@@ -1209,7 +1203,7 @@ function [sphandle] = configureControlPort(comPortNum)
     %    delete(instrfind('Type','serial'));  % delete open serial ports.
     %end
     comPortString = ['COM' num2str(comPortNum)];
-    sphandle = serial('/dev/ttyUSB0','BaudRate',115200); % hardcoded to '/dev/ttyUSB*'
+    sphandle = serial('/dev/ttyUSB2','BaudRate',115200); % hardcoded to '/dev/ttyUSB*'
     set(sphandle,'Parity','none')    
     set(sphandle,'Terminator','LF')        
     fopen(sphandle);
