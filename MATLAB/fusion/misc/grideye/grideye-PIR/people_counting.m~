@@ -57,7 +57,7 @@ function [num_people, coordinates] = people_counting(data)
 
             % record coordinates of a person detected
             z = (pix_val - min_val) * (max_z - min_z) / (max_val - min_val) + min_z;
-            coordinates(num_people, 1) = round(x / 4); % 32x32 to 8x8
+            coordinates(num_people, 1) = round(x / 4) / 4; % 32x32 to 8x8
             coordinates(num_people, 2) = round(z);
         end
     end

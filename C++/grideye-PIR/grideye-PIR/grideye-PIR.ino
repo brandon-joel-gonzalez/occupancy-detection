@@ -80,6 +80,6 @@ void loop() {
     }
     // end print with return
     Serial.println();
-    // 5sec delay between sends
-    delay(5000);
+    // 1sec delay between sends
+    delay(1000);
   }

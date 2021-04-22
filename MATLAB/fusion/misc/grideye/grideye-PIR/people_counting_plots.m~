@@ -75,7 +75,7 @@ function [num_people, coordinates] = people_counting_plots(data)
     %fprintf(1,'Blob #      Mean Intensity  Area   Perimeter    Centroid       Diameter\n');
     % Loop over all blobs printing their measurements to the command window.
     num_people = 0;
-    coordinates = zeros(numberOfBlobs, 2);
+    coordinates = zeros(numberOfBlobs, 1, 1);
     for k = 1 : numberOfBlobs           % Loop through all blobs.
         % Find the mean of each blob.  (R2008a has a better way where you can pass the original image
         % directly into regionprops.  The way below works for all versions including earlier versions.)
@@ -95,22 +95,17 @@ function [num_people, coordinates] = people_counting_plots(data)
         if blobArea > 7.0
             num_people = num_people + 1
             
-        % get grideye coordinates
-        x = blobMeasurements(k).Centroid(1);
-        y = blobMeasurements(k).Centroid(2);
-
-        % find corresponding pixel val (0<->1) in interpolated bitmap
-        pix_val = data_interp(round(x), round(y));
-
-        % map pixel from mintemp-maxtemp to z coordinate
-        max_val = max(data_interp(:));
-        min_val = min(data_interp(:));
-        max_z = 8;
-        min_z = 0;
-        
-        z = (pix_val - min_val) * (max_z - min_z) / (max_val - min_val) + min_z;
-        coordinates(k, 1) = round(x / 4); % 32x32 to 8x8
-        coordinates(k, 2) = round(z);
+            % get grideye coordinates
+            x = blobMeasurements(k).Centroid(1);
+            y = blobMeasurements(k).Centroid(2);
+            
+            % find corresponding pixel in interpolated bitmap
+            pix = data_interp(round(x), round(y));
+            
+            % map pixel from mintemp-maxtemp to z coordinate
+            max_val = max(data_interp(
+            z = (pix - min_pixel) * (8 - 0) / (max_pixel - min_pixel) + 0;
+            coordinates(k, 1, 1) = z;
         end
     end
 end
