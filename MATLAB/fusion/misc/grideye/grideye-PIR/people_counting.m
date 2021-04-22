@@ -1,4 +1,4 @@
-% IR people counting - no plots
+% IR people counting
 % takes in 8x8 array
 % outputs number of detected people and coordinates of person
 function [num_people, coordinates] = people_counting(data)
@@ -42,21 +42,21 @@ function [num_people, coordinates] = people_counting(data)
         if blobArea > 7.0
             num_people = num_people + 1
             
-            % get grideye coordinates
+            % get blob in 32x32 coordinates
             x = blobMeasurements(k).Centroid(1);
             y = blobMeasurements(k).Centroid(2);
 
-            % find corresponding pixel val (0<->1) in interpolated bitmap
+            % find corresponding pixel val (0<->1) in 32x32 bitmap
             pix_val = data_interp(round(x), round(y));
 
-            % map pixel from mintemp-maxtemp to z coordinate
+            % map pixel from 0<->1 temp to z-coordinate
             max_val = max(data_interp(:));
             min_val = min(data_interp(:));
             max_z = 8;
             min_z = 0;
+            z = (pix_val - min_val) * (max_z - min_z) / (max_val - min_val) + min_z;
 
             % record coordinates of a person detected
-            z = (pix_val - min_val) * (max_z - min_z) / (max_val - min_val) + min_z;
             coordinates(num_people, 1) = round(x / 4); % 32x32 to 8x8
             coordinates(num_people, 2) = round(z);
         end

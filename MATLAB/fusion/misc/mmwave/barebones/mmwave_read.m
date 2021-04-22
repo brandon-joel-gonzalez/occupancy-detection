@@ -1,8 +1,8 @@
 % mmwave reading function
 % no GUI elements
 % takes in data port, cfg parameters, and scene
-% returns num of targets located
-function [numTargets] = mmwave_read(hDataSerialPort, Params, scene)
+% returns num of targets located, along with positions/velocities
+function [numTargets, targets] = mmwave_read(hDataSerialPort, Params, scene)
 
     %% Init variables
 %     trackerRun = 'Target';
@@ -106,7 +106,7 @@ function [numTargets] = mmwave_read(hDataSerialPort, Params, scene)
 %     skipProcessing = 0;
     frameNum = 1;
 %     frameNumLogged = 1;
-    fprintf('------------------\n');
+%     fprintf('------------------\n');
     
     %% read data
     frameStart = tic;
@@ -161,6 +161,7 @@ function [numTargets] = mmwave_read(hDataSerialPort, Params, scene)
 %     numInputPoints = 0;
     numTargets = 0;
 %     mIndex = [];
+    targets = [];
 
     if(dataLength > 0)
         %Read all packet
@@ -231,6 +232,7 @@ function [numTargets] = mmwave_read(hDataSerialPort, Params, scene)
                         G(n)    = typecast(uint8(rxData(offset+65:offset+68)),'single');    %1x4=4bytes
                         offset = offset + 68;
                     end
+                    targets = S; % save target positions/velocities
 
                 case 8
                     % Target Index TLV

@@ -20,6 +20,7 @@ noise = grideye_read(s);
 mean_noise = mean(mean(noise)); % calculate mean noise
 noise = noise-mean_noise; % subtract mean noise from each pixel's noise
 
+% track target
 figure;
 hold;
 xlim([0 8]);

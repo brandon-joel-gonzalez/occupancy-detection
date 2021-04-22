@@ -575,6 +575,8 @@ function pplcount_gui()
             mIndex = [];
 
             if(dataLength > 0)
+                disp('X :
+                
                 %Read all packet
                 [rxData, byteCount] = fread(hDataSerialPort, double(dataLength), 'uint8');
                 if(byteCount ~= double(dataLength))
@@ -775,7 +777,6 @@ function pplcount_gui()
             end     
 
             for n=1:tNumC
-                % fprintf('x: %d, y: %d', S(1, n), S(2, n)) % print xy
 
                 tid = TID(n)+1;            
                 if(tid > maxNumTracks)
