@@ -106,7 +106,7 @@ function [numTargets, targets] = mmwave_read(hDataSerialPort, Params, scene)
 %     skipProcessing = 0;
     frameNum = 1;
 %     frameNumLogged = 1;
-%     fprintf('------------------\n');
+    fprintf('------------------\n');
     
     %% read data
     frameStart = tic;

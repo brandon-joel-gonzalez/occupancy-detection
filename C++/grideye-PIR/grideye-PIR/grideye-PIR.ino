@@ -68,18 +68,18 @@ void loop() {
   }
 }
 
-  void readGrideye() {
-    // read grideye data
-    amg.readPixels(pixels);
+void readGrideye() {
+  // read grideye data
+  amg.readPixels(pixels);
 
-    // Print the temperature of each pixel
-    for (unsigned char i = 0; i < 64; i++)
-    {
-      Serial.print(pixels[i]);
-      Serial.print(",");
-    }
-    // end print with return
-    Serial.println();
-    // 1sec delay between sends
-    delay(1000);
+  // Print the temperature of each pixel
+  for (unsigned char i = 0; i < 64; i++)
+  {
+    Serial.print(pixels[i]);
+    Serial.print(",");
   }
+  // end print with return
+  Serial.println();
+  // delay between sends
+  delay(1000);
+}

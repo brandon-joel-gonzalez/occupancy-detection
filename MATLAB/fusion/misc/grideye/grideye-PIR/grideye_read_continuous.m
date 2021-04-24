@@ -4,7 +4,7 @@ clear all
 close all
 clc
 
-s = serial('/dev/ttyUSB0'); % change this to desired Arduino board port
+s = serial('/dev/ttyUSB4'); % change this to desired Arduino board port
 set(s,'BaudRate',9600); % baud rate for communication
 fopen(s); % open the comm between Arduino and MATLAB
 
@@ -16,10 +16,14 @@ pause(1) % wait a moment to begin reading grideye data
 % Sensor noise measurement
 % for this: place a large object with uniform temperature in
 % front of sensor (book, wall, table) - this is a psuedo calibration
-noise = grideye_read(s);
-mean_noise = mean(mean(noise)); % calculate mean noise
-noise = noise-mean_noise; % subtract mean noise from each pixel's noise
-
+noise = [];
+for i=1:5
+    noise = grideye_read(s);
+    mean_noise = mean(mean(noise)); % calculate mean noise
+    noise = noise-mean_noise; % subtract mean noise from each pixel's noise
+    pause(.1)
+end
+    
 % track target
 figure;
 hold;
@@ -44,5 +48,5 @@ while true
     end
     
     % wait for next reading
-    pause(1)
+    pause(.1)
 end

@@ -1,7 +1,6 @@
-pplcount_gui();
 %main function
-function pplcount_gui()
-    clear, clc
+function [numTargets, S] = mmwave_read(hDataSerialPort, hControlSerialPort, Params, scene, wall, cfgData)
+%     clear, clc
 
     %% SETUP SELECTIONS
 
@@ -10,216 +9,216 @@ function pplcount_gui()
     % To programmatically setup the scene follow the example in Prgm_2box.
 
     % Scene Run choice: {'GUI_Setup' | 'Prgm_2xy update plot matlabbox' | 'Prgm_MaxFOV','My_Scene'};
-    sceneRun = 'Prgm_2box';
-    cfgData = struct('alloc', [], 'gating', [], 'cfar', []);
-
-    % 2. Specify COM ports if programmatically setting up scene
-    if (~strcmp(sceneRun,'GUI_Setup'))
-        %%%%% EDIT COM PORTS %%%%%%
-        controlSerialPort = 10; % hardcoded to '/dev/ttyUSB'
-        dataSerialPort = 11; % hardcoded to '/dev/ttyUSB'
-        loadCfg = 1;
-    end 
+%     sceneRun = 'Prgm_2box';
+%     cfgData = struct('alloc', [], 'gating', [], 'cfar', []);
+% 
+%     % 2. Specify COM ports if programmatically setting up scene
+%     if (~strcmp(sceneRun,'GUI_Setup'))
+%         %%%%% EDIT COM PORTS %%%%%%
+%         controlSerialPort = 10; % hardcoded to '/dev/ttyUSB1'
+%         dataSerialPort = 11; % hardcoded to '/dev/ttyUSB2'
+%         loadCfg = 1;
+%     end 
 
 
     %% Setup tracking scene
 
     % Enables setting parameters by GUI
-    if(strcmp(sceneRun,'GUI_Setup'))
-
-        % Call setup GUI
-        hSetup = setup();
-        % populate cfg data
-        cfgfilename = hSetup.cfg.filename;
-        cliCfg = readCfg(cfgfilename);
-        for m=1:length(cliCfg)
-           line = cliCfg{m};
-           args = strsplit(line);
-           arg = char(args{1});
-           switch arg
-               case 'GatingParam'
-                   cfgData.gating = args(2:end);
-               case 'AllocationParam'
-                   cfgData.alloc = args(2:end);
-               case 'cfarCfg'
-                   cfgData.cfar = [args(11:12) '1'];
-           end
-                       
-        end
-        hControlSerialPort = hSetup.hControlSerialPort;
-        
-        close(hSetup.figure1);
-        % Get parameters defined in GUI
-        camIndex = hSetup.camIndex;
-        hDataSerialPort = hSetup.hDataSerialPort;
-        hControlSerialPort = hSetup.hControlSerialPort;
-        wall = hSetup.wall;
-        scene.azimuthTilt = hSetup.angle*pi/180;
-        Params = hSetup.params; 
-        % Target box settings
-        scene.numberOfTargetBoxes = size(hSetup.subzone,1); 
-        scene.targetBox = hSetup.subzone;
-        % Define wall [BLx BLy W H]
-        scene.areaBox = [wall.left wall.back abs(wall.left)+wall.right wall.front+abs(wall.back)];
-
-        % Define plotting area [Lx Rx By Ty]
-        scene.maxPos = [scene.areaBox(1)-0.1 scene.areaBox(1)+scene.areaBox(3)+0.1 scene.areaBox(2)-0.1 scene.areaBox(2)+scene.areaBox(4)+0.1];
-
-        % Chirp config
-        loadCfg = 0; %disabled because loaded in GUI
-    end
-
-    % Programmatically set scene. Includes example of setting boundary boxes to count in 
-    if(strcmp(sceneRun,'Prgm_2box'))
-
-        %Read Chirp Configuration file
-        configurationFileName = 'mmw_pplcount_demo_default.cfg';   
-        cliCfg = readCfg(configurationFileName);
-        Params = parseCfg(cliCfg);
-
-        % Room Wall dimensions [m]
-        % Measured relative to radar
-        wall.left = -6; % signed: - required
-        wall.right = 6;
-        wall.front = 6;
-        wall.back = -0; % signed: - required
-
-        % define wall [BLx BLy W H]
-        scene.areaBox = [wall.left wall.back abs(wall.left)+wall.right wall.front+abs(wall.back)];
-
-        % Define two rectangles for specific counting in the region
-        % Target box settings
-        scene.numberOfTargetBoxes = 2;
-
-        % Parameters to make it easier to define two rectangles of the same size
-            % that are side by side    
-        % RO = Rectangle Origin. RO is measured relative to Left Back wall corner
-        box.ROxtoLB = 1.0; % x distance from left wall 
-        box.ROytoLB = 1.5; % y distance from back wall
-        box.height = 2;    % height of boxes 
-        box.sep = 0.6;     % seperation width of boxes
-        box.width = 1;     % width of boxes 
-        box.RTXplot = box.ROxtoLB+wall.left;
-        box.RTYplot = box.ROytoLB+wall.back;
-
-
-        % Each row of targetBox specifies the dimensions of a rectangle for counting.
-        % The # of rows of targetBox must match numberOfTargetBoxes.
-        % The rectangles are specified by (x,y) coordinate and width and height 
-        % Custom rectangles can be defined instead if two side by side rects of
-        % same size are not desired using [RTCx RTCy W H] convention
-        scene.targetBox = [box.RTXplot box.RTYplot box.width box.height; 
-                           (box.RTXplot+box.width+box.sep) box.RTYplot box.width box.height];
-
-
-        % define plotting area as margin around wall
-        margin = 0.1; %[m]
-        scene.maxPos = [scene.areaBox(1)-margin ...
-                        scene.areaBox(1)+scene.areaBox(3)+margin ...
-                        scene.areaBox(2)-margin ...
-                        scene.areaBox(2)+scene.areaBox(4)+margin];
-
-        % Azimuth tilt of radar. 
-        angle = +0; % Signed: + if tilted towards R wall, - if L, 0 if straight forward
-        scene.azimuthTilt = angle*pi/180;
-    end
-
+%     if(strcmp(sceneRun,'GUI_Setup'))
+% 
+%         % Call setup GUI
+%         hSetup = setup();
+%         % populate cfg data
+%         cfgfilename = hSetup.cfg.filename;
+%         cliCfg = readCfg(cfgfilename);
+%         for m=1:length(cliCfg)
+%            line = cliCfg{m};
+%            args = strsplit(line);
+%            arg = char(args{1});
+%            switch arg
+%                case 'GatingParam'
+%                    cfgData.gating = args(2:end);
+%                case 'AllocationParam'
+%                    cfgData.alloc = args(2:end);
+%                case 'cfarCfg'
+%                    cfgData.cfar = [args(11:12) '1'];
+%            end
+%                        
+%         end
+%         hControlSerialPort = hSetup.hControlSerialPort;
+%         
+%         close(hSetup.figure1);
+%         % Get parameters defined in GUI
+%         camIndex = hSetup.camIndex;
+%         hDataSerialPort = hSetup.hDataSerialPort;
+%         hControlSerialPort = hSetup.hControlSerialPort;
+%         wall = hSetup.wall;
+%         scene.azimuthTilt = hSetup.angle*pi/180;
+%         Params = hSetup.params; 
+%         % Target box settings
+%         scene.numberOfTargetBoxes = size(hSetup.subzone,1); 
+%         scene.targetBox = hSetup.subzone;
+%         % Define wall [BLx BLy W H]
+%         scene.areaBox = [wall.left wall.back abs(wall.left)+wall.right wall.front+abs(wall.back)];
+% 
+%         % Define plotting area [Lx Rx By Ty]
+%         scene.maxPos = [scene.areaBox(1)-0.1 scene.areaBox(1)+scene.areaBox(3)+0.1 scene.areaBox(2)-0.1 scene.areaBox(2)+scene.areaBox(4)+0.1];
+% 
+%         % Chirp config
+%         loadCfg = 0; %disabled because loaded in GUI
+%     end
 
     % Programmatically set scene. Includes example of setting boundary boxes to count in 
-    if(strcmp(sceneRun,'Prgm_MaxFOV'))
+%     if(strcmp(sceneRun,'Prgm_2box'))
+% 
+%         %Read Chirp Configuration file
+%         configurationFileName = 'mmw_pplcount_demo_default.cfg';   
+%         cliCfg = readCfg(configurationFileName);
+%         Params = parseCfg(cliCfg);
+% 
+%         % Room Wall dimensions [m]
+%         % Measured relative to radar
+%         wall.left = -6; % signed: - required
+%         wall.right = 6;
+%         wall.front = 6;
+%         wall.back = -0; % signed: - required
+% 
+%         % define wall [BLx BLy W H]
+%         scene.areaBox = [wall.left wall.back abs(wall.left)+wall.right wall.front+abs(wall.back)];
+% 
+%         % Define two rectangles for specific counting in the region
+%         % Target box settings
+%         scene.numberOfTargetBoxes = 2;
+% 
+%         % Parameters to make it easier to define two rectangles of the same size
+%             % that are side by side    
+%         % RO = Rectangle Origin. RO is measured relative to Left Back wall corner
+%         box.ROxtoLB = 1.0; % x distance from left wall 
+%         box.ROytoLB = 1.5; % y distance from back wall
+%         box.height = 2;    % height of boxes 
+%         box.sep = 0.6;     % seperation width of boxes
+%         box.width = 1;     % width of boxes 
+%         box.RTXplot = box.ROxtoLB+wall.left;
+%         box.RTYplot = box.ROytoLB+wall.back;
+% 
+% 
+%         % Each row of targetBox specifies the dimensions of a rectangle for counting.
+%         % The # of rows of targetBox must match numberOfTargetBoxes.
+%         % The rectangles are specified by (x,y) coordinate and width and height 
+%         % Custom rectangles can be defined instead if two side by side rects of
+%         % same size are not desired using [RTCx RTCy W H] convention
+%         scene.targetBox = [box.RTXplot box.RTYplot box.width box.height; 
+%                            (box.RTXplot+box.width+box.sep) box.RTYplot box.width box.height];
+% 
+% 
+%         % define plotting area as margin around wall
+%         margin = 0.1; %[m]
+%         scene.maxPos = [scene.areaBox(1)-margin ...
+%                         scene.areaBox(1)+scene.areaBox(3)+margin ...
+%                         scene.areaBox(2)-margin ...
+%                         scene.areaBox(2)+scene.areaBox(4)+margin];
+% 
+%         % Azimuth tilt of radar. 
+%         angle = +0; % Signed: + if tilted towards R wall, - if L, 0 if straight forward
+%         scene.azimuthTilt = angle*pi/180;
+%     end
 
-        %Read Chirp Configuration file
-        configurationFileName = 'mmw_pcdemo_default.cfg';   
-        cliCfg = readCfg(configurationFileName);
-        Params = parseCfg(cliCfg);
 
-        % Room Wall dimensions [m]
-        % Measured relative to radar
-        wall.left = -6; % signed: - required
-        wall.right = 6;
-        wall.front = 6;
-        wall.back = -0; % signed: - required
-
-        % define wall [BLx BLy W H]
-        scene.areaBox = [wall.left wall.back abs(wall.left)+wall.right wall.front+abs(wall.back)];
-
-        % Define two rectangles for specific counting in the region
-        % Target box settings
-        scene.numberOfTargetBoxes = 0;
-
-        % Parameters to make it easier to define two rectangles of the same size
-            % that are side by side    
-        % RO = Rectangle Origin. RO is measured relative to Left Back wall corner
-        box.ROxtoLB = 1.0; % x distance from left wall 
-        box.ROytoLB = 1.5; % y distance from back wall
-        box.height = 2;    % height of boxes 
-        box.sep = 0.6;     % seperation width of boxes
-        box.width = 1;     % width of boxes 
-        box.RTXplot = box.ROxtoLB+wall.left;
-        box.RTYplot = box.ROytoLB+wall.back;
-
-
-        % Each row of targetBox specifies the dimensions of a rectangle for counting.
-        % The # of rows of targetBox must match numberOfTargetBoxes.
-        % The rectangles are specified by (x,y) coordinate and width and height 
-        % Custom rectangles can be defined instead if two side by side rects of
-        % same size are not desired using [RTCx RTCy W H] convention
-        scene.targetBox = [box.RTXplot box.RTYplot box.width box.height; 
-                           (box.RTXplot+box.width+box.sep) box.RTYplot box.width box.height];
-
-
-        % define plotting area as margin around wall
-        margin = 0.1; %[m]
-        scene.maxPos = [scene.areaBox(1)-margin ...
-                        scene.areaBox(1)+scene.areaBox(3)+margin ...
-                        scene.areaBox(2)-margin ...
-                        scene.areaBox(2)+scene.areaBox(4)+margin];
-
-        % Azimuth tilt of radar. 
-        angle = +0; % Signed: + if tilted towards R wall, - if L, 0 if straight forward
-        scene.azimuthTilt = angle*pi/180;
-    end
-
-    if(strcmp(sceneRun,'My_Scene'))
-    end
+    % Programmatically set scene. Includes example of setting boundary boxes to count in 
+%     if(strcmp(sceneRun,'Prgm_MaxFOV'))
+% 
+%         %Read Chirp Configuration file
+%         configurationFileName = 'mmw_pcdemo_default.cfg';   
+%         cliCfg = readCfg(configurationFileName);
+%         Params = parseCfg(cliCfg);
+% 
+%         % Room Wall dimensions [m]
+%         % Measured relative to radar
+%         wall.left = -6; % signed: - required
+%         wall.right = 6;
+%         wall.front = 6;
+%         wall.back = -0; % signed: - required
+% 
+%         % define wall [BLx BLy W H]
+%         scene.areaBox = [wall.left wall.back abs(wall.left)+wall.right wall.front+abs(wall.back)];
+% 
+%         % Define two rectangles for specific counting in the region
+%         % Target box settings
+%         scene.numberOfTargetBoxes = 0;
+% 
+%         % Parameters to make it easier to define two rectangles of the same size
+%             % that are side by side    
+%         % RO = Rectangle Origin. RO is measured relative to Left Back wall corner
+%         box.ROxtoLB = 1.0; % x distance from left wall 
+%         box.ROytoLB = 1.5; % y distance from back wall
+%         box.height = 2;    % height of boxes 
+%         box.sep = 0.6;     % seperation width of boxes
+%         box.width = 1;     % width of boxes 
+%         box.RTXplot = box.ROxtoLB+wall.left;
+%         box.RTYplot = box.ROytoLB+wall.back;
+% 
+% 
+%         % Each row of targetBox specifies the dimensions of a rectangle for counting.
+%         % The # of rows of targetBox must match numberOfTargetBoxes.
+%         % The rectangles are specified by (x,y) coordinate and width and height 
+%         % Custom rectangles can be defined instead if two side by side rects of
+%         % same size are not desired using [RTCx RTCy W H] convention
+%         scene.targetBox = [box.RTXplot box.RTYplot box.width box.height; 
+%                            (box.RTXplot+box.width+box.sep) box.RTYplot box.width box.height];
+% 
+% 
+%         % define plotting area as margin around wall
+%         margin = 0.1; %[m]
+%         scene.maxPos = [scene.areaBox(1)-margin ...
+%                         scene.areaBox(1)+scene.areaBox(3)+margin ...
+%                         scene.areaBox(2)-margin ...
+%                         scene.areaBox(2)+scene.areaBox(4)+margin];
+% 
+%         % Azimuth tilt of radar. 
+%         angle = +0; % Signed: + if tilted towards R wall, - if L, 0 if straight forward
+%         scene.azimuthTilt = angle*pi/180;
+%     end
+% 
+%     if(strcmp(sceneRun,'My_Scene'))
+%     end
     
     %% Serial setup
-    if (~strcmp(sceneRun,'GUI_Setup'))
-        %Configure data UART port with input buffer to hold 100+ frames 
-        hDataSerialPort = configureDataSport(dataSerialPort, 65536);
-
-        %Send Configuration Parameters to IWR16xx
-        if(loadCfg)
-            mmwDemoCliPrompt = char('mmwDemo:/>');
-            hControlSerialPort = configureControlPort(controlSerialPort);
-            %Send CLI configuration to IWR16xx
-            fprintf('Sending configuration from %s file to IWR16xx ...\n', configurationFileName);
-            for k=1:length(cliCfg)
-                %pause(.25)
-                fprintf(hControlSerialPort, cliCfg{k});
-                fprintf('%s\n', cliCfg{k});
-                echo = fgetl(hControlSerialPort); % Get an echo of a command
-                done = fgetl(hControlSerialPort); % Get "Done" 
-                prompt = fread(hControlSerialPort, size(mmwDemoCliPrompt,2)); % Get the prompt back 
-                
-                line = cliCfg{k};
-                args = strsplit(line);
-                arg = char(args{1});
-                switch arg
-                   case 'GatingParam'
-                       cfgData.gating = args(2:end);
-                   case 'AllocationParam'
-                       cfgData.alloc = args(2:end);
-                   case 'cfarCfg'
-                       cfgData.cfar = [args(11:12) '1'];
-                end
-                
-                
-            end
-    %         fclose(hControlSerialPort);
-    %         delete(hControlSerialPort);
-        end
-    end
+%     if (~strcmp(sceneRun,'GUI_Setup'))
+%         %Configure data UART port with input buffer to hold 100+ frames 
+%         hDataSerialPort = configureDataSport(dataSerialPort, 65536);
+% 
+%         %Send Configuration Parameters to IWR16xx
+%         if(loadCfg)
+%             mmwDemoCliPrompt = char('mmwDemo:/>');
+%             hControlSerialPort = configureControlPort(controlSerialPort);
+%             %Send CLI configuration to IWR16xx
+%             fprintf('Sending configuration from %s file to IWR16xx ...\n', configurationFileName);
+%             for k=1:length(cliCfg)
+%                 %pause(.25)
+%                 fprintf(hControlSerialPort, cliCfg{k});
+%                 fprintf('%s\n', cliCfg{k});
+%                 echo = fgetl(hControlSerialPort); % Get an echo of a command
+%                 done = fgetl(hControlSerialPort); % Get "Done" 
+%                 prompt = fread(hControlSerialPort, size(mmwDemoCliPrompt,2)); % Get the prompt back 
+%                 
+%                 line = cliCfg{k};
+%                 args = strsplit(line);
+%                 arg = char(args{1});
+%                 switch arg
+%                    case 'GatingParam'
+%                        cfgData.gating = args(2:end);
+%                    case 'AllocationParam'
+%                        cfgData.alloc = args(2:end);
+%                    case 'cfarCfg'
+%                        cfgData.cfar = [args(11:12) '1'];
+%                 end
+%                 
+%                 
+%             end
+%     %         fclose(hControlSerialPort);
+%     %         delete(hControlSerialPort);
+%         end
+%     end
 
     %% Init variables
     trackerRun = 'Target';
@@ -511,11 +510,13 @@ function pplcount_gui()
 
     update = 0;
     targetFrameNum = 0;
+    lostSyncTime = 0;
     %% Main
-    while(isvalid(hDataSerialPort))
+    while(isvalid(hDataSerialPort)) % read data if valid
 
 
         while(lostSync == 0 && isvalid(hDataSerialPort))
+
             frameStart = tic;
             fHist(frameNum).timestamp = frameStart;
             bytesAvailable = get(hDataSerialPort,'BytesAvailable');
@@ -959,12 +960,24 @@ function pplcount_gui()
             elseif(bytesAvailable < 1000)
                 runningSlow = 0;
             end
-
+            
             if(runningSlow)
                 % Don't pause, we are slow
             else
-                pause(0.01);
+%                 pause(0.01);
             end
+            
+            % track target data
+            for i = 1:numTargets
+                fprintf('x: %d, y: %d\n', S(1, i), S(2, i)) % print xy
+            end
+            
+            % read grideye x-data
+            
+            % perform kalman filter on position
+            
+            % wait for next measurement
+            pause(1)
         end
 
         if(targetFrameNum)
@@ -1189,7 +1202,7 @@ function [sphandle] = configureDataSport(comPortNum, bufferSize)
         delete(instrfind('Type','serial'));  % delete open serial ports.
     end
     comPortString = ['COM' num2str(comPortNum)];
-    sphandle = serial('/dev/ttyUSB1','BaudRate',921600); % hardcoded to '/dev/ttyUSB*'
+    sphandle = serial('/dev/ttyUSB3','BaudRate',921600); % hardcoded to '/dev/ttyUSB*'
     set(sphandle,'Terminator', '');
     set(sphandle,'InputBufferSize', bufferSize);
     set(sphandle,'Timeout',10);
@@ -1203,7 +1216,7 @@ function [sphandle] = configureControlPort(comPortNum)
     %    delete(instrfind('Type','serial'));  % delete open serial ports.
     %end
     comPortString = ['COM' num2str(comPortNum)];
-    sphandle = serial('/dev/ttyUSB0','BaudRate',115200); % hardcoded to '/dev/ttyUSB*'
+    sphandle = serial('/dev/ttyUSB2','BaudRate',115200); % hardcoded to '/dev/ttyUSB*'
     set(sphandle,'Parity','none')    
     set(sphandle,'Terminator','LF')        
     fopen(sphandle);
