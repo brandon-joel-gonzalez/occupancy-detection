@@ -3,8 +3,8 @@
 % outputs number of detected people
 function [num_people, coordinates] = people_counting_plots(data)
     % map pixel temp to 0<->1 range
-    max_pixel = max(data(:))
-    data_map = data / max_pixel
+    max_pixel = max(data(:));
+    data_map = data / max_pixel;
     
     % interpolate to 32x32 grayscale image
     [x_locs,y_locs] = meshgrid(1:8);
@@ -16,7 +16,8 @@ function [num_people, coordinates] = people_counting_plots(data)
     % Method #1: using im2bw()
     normalizedThresholdValue = 0.95; % In range 0 to 1.
     thresholdValue = normalizedThresholdValue * max(max(originalImage)); % Gray Levels.
-    binaryImage = im2bw(originalImage, normalizedThresholdValue);       % One way to threshold to binary
+%     binaryImage = im2bw(originalImage, normalizedThresholdValue);       % One way to threshold to binary
+    binaryImage = originalImage > thresholdValue;
 
     % Do a "hole fill" to get rid of any background pixels or "holes" inside the blobs.
     binaryImage = imfill(binaryImage, 'holes');
@@ -75,7 +76,7 @@ function [num_people, coordinates] = people_counting_plots(data)
     %fprintf(1,'Blob #      Mean Intensity  Area   Perimeter    Centroid       Diameter\n');
     % Loop over all blobs printing their measurements to the command window.
     num_people = 0;
-    coordinates = zeros(numberOfBlobs, 2);
+    coordinates = zeros(numberOfBlobs, 3);
     for k = 1 : numberOfBlobs           % Loop through all blobs.
         % Find the mean of each blob.  (R2008a has a better way where you can pass the original image
         % directly into regionprops.  The way below works for all versions including earlier versions.)
@@ -93,7 +94,7 @@ function [num_people, coordinates] = people_counting_plots(data)
         
         % check if blob is big enough to resemble human
         if blobArea > 7.0
-            num_people = num_people + 1
+            num_people = num_people + 1;
             
         % get grideye coordinates
         x = blobMeasurements(k).Centroid(1);
@@ -110,7 +111,8 @@ function [num_people, coordinates] = people_counting_plots(data)
         
         z = (pix_val - min_val) * (max_z - min_z) / (max_val - min_val) + min_z;
         coordinates(k, 1) = round(x / 4); % 32x32 to 8x8
-        coordinates(k, 2) = round(z);
+        coordinates(k, 2) = round(y / 4);
+        coordinates(k, 3) = round(z);
         end
     end
 end

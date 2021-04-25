@@ -39,16 +39,13 @@ void setup() {
 
   bool status;
 
-  // default settings
-  amg.begin();
-
   // Setup LEDs as Outputs
   pinMode(led_pin, OUTPUT);
   // Setup PIR as Input
   pinMode(pir_pin, INPUT);
 
   digitalWrite(led_pin, HIGH);
-  delay(5000); // let sensors boot up
+  delay(5000); // let PIR boot up
   digitalWrite(led_pin, LOW);
 }
 
@@ -58,9 +55,10 @@ void loop() {
 
   // first time PIR detects movement
   if (triggerGrideye == 0) {
-    // display LED for 1 second to signal motion detection
+    // boot grideye and wait 1 second
     digitalWrite(led_pin, HIGH);
     triggerGrideye = 1;
+    amg.begin();
     delay(1000);
     digitalWrite(led_pin, LOW);
   } else {

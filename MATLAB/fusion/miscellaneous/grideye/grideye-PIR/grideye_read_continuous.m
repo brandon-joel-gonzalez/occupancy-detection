@@ -4,7 +4,7 @@ clear all
 close all
 clc
 
-s = serial('/dev/ttyUSB4'); % change this to desired Arduino board port
+s = serial('/dev/ttyUSB2'); % change this to desired Arduino board port
 set(s,'BaudRate',9600); % baud rate for communication
 fopen(s); % open the comm between Arduino and MATLAB
 
@@ -25,26 +25,26 @@ for i=1:5
 end
     
 % track target
-figure;
-hold;
-xlim([0 8]);
-ylim([0 8]);
-xlabel('x position');
-ylabel('z position');
+% figure;
+% hold;
+% xlim([0 8]);
+% ylim([0 8]);
+% xlabel('x position');
+% ylabel('z position');
 
 while true
-    % read data
-    data_grid = grideye_read(s) - noise;
+    % read data - rotate based on grideye orientation
+    data_grid = rot90(grideye_read(s));% - noise);
     
     % count people
     [num_people, coordinates] = people_counting(data_grid);
     
     % plot people
-    cla
     for i = 1:num_people
         x = coordinates(i, 1);
-        z = coordinates(i, 2);
-        scatter(x, z, 'filled');
+        fprintf("person %d, x-coord: %d\n", i, x);
+%         z = coordinates(i, 2);
+%         scatter(x, z, 'filled');
     end
     
     % wait for next reading

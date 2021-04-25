@@ -1,5 +1,5 @@
 %main function
-function [numTargets, S] = mmwave_read(hDataSerialPort, hControlSerialPort, Params, scene, wall, cfgData, s, noise)
+function [numTargets, S] = mmwave_read(hDataSerialPort, hControlSerialPort, Params, scene, wall, cfgData, results, numMeasurements, sampleRate, camera)
 %     clear, clc
 
     %% SETUP SELECTIONS
@@ -967,22 +967,38 @@ function [numTargets, S] = mmwave_read(hDataSerialPort, hControlSerialPort, Para
 %                 pause(0.01);
             end
             
-            % track mmwave target data
+            %%% TAKE PEOPLE COUNTING MEASUREMENTS
+            
+            % track target data
+%             max_x = 1;
+%             min_x = -1;
+%             max_y = 2;
+%             min_y = 0;
+%             max_bound = 8;
+%             min_bound = 1;
+            
             for i = 1:numTargets
-                fprintf('mmw_x: %d, mmw_y: %d\n', S(1, i), S(2, i)) % print xy
+                fprintf('x: %d, y: %d\n', S(1, i), S(2, i)); % print xy
             end
             
-%             % read grideye x-data
-%             [grideye_ppl, grideye_x] = grideye_count(grideye_read(s) - noise);
-%             
-%             for i = 1:grideye_ppl
-%                 fprintf('grideye_x: %d', grideye_x(i, 1));
-%             end
+            % take snapshot
+            image = snapshot(camera);
+            imageFile = sprintf('test_photos/test_mmwave#%d.png', numMeasurements); % save camera image
+            imwrite(image, imageFile);
             
-            % perform kalman filter on position
+            % see if we're done measuring
+            numMeasurements = numMeasurements - 1;
+            if numMeasurements == 0
+                break;
+            end
             
             % wait for next measurement
-            pause(1)
+            pause(sampleRate)
+        end
+        
+        % see if we're done measuring
+        if numMeasurements == 0
+            break;
         end
 
         if(targetFrameNum)

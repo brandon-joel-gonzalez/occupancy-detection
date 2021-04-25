@@ -1,7 +1,7 @@
 % mmwave initialization function
 % takes in data/control port names
 % returns data port and parameters
-function [hDataSerialPort, hControlSerialPort, Params, scene, wall, cfgData] = mmwave_initialize(dataPort, controlPort, s)
+function [hDataSerialPort, hControlSerialPort, Params, scene, wall, cfgData] = mmwave_initialize(dataPort, controlPort)
     % clear, clc
 
     %% Setup tracking scene

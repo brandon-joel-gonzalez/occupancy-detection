@@ -1,5 +1,5 @@
 %main function
-function [numTargets, S] = mmwave_read(hDataSerialPort, hControlSerialPort, Params, scene, wall, cfgData)
+function [numTargets, S] = mmwave_read(hDataSerialPort, hControlSerialPort, Params, scene, wall, cfgData, numMeasurements, sampleRate)
 %     clear, clc
 
     %% SETUP SELECTIONS
@@ -968,16 +968,30 @@ function [numTargets, S] = mmwave_read(hDataSerialPort, hControlSerialPort, Para
             end
             
             % track target data
+%             max_x = 1;
+%             min_x = -1;
+%             max_y = 2;
+%             min_y = 0;
+%             max_bound = 8;
+%             min_bound = 1;
+            
             for i = 1:numTargets
-                fprintf('x: %d, y: %d\n', S(1, i), S(2, i)) % print xy
+                fprintf('x: %d, y: %d\n', S(1, i), S(2, i)); % print xy
             end
             
-            % read grideye x-data
-            
-            % perform kalman filter on position
+            % see if we're done measuring
+            numMeasurements = numMeasurements - 1;
+            if numMeasurements == 0
+                break;
+            end
             
             % wait for next measurement
-            pause(1)
+            pause(sampleRate)
+        end
+        
+        % see if we're done measuring
+        if numMeasurements == 0
+            break;
         end
 
         if(targetFrameNum)

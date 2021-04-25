@@ -1,10 +1,10 @@
 % IR people counting
 % takes in 8x8 array
-% outputs number of detected people and x-coordinate of people
+% outputs number of detected people and coordinates of person
 function [num_people, coordinates] = grideye_count(data)
     % map pixel temp to 0<->1 range
     max_pixel = max(data(:));
-%     min_pixel = min(data(:));
+%     min_pixel = min(data(:))
     data_map = data / max_pixel;
     
     % interpolate to 32x32 grayscale image
@@ -18,6 +18,7 @@ function [num_people, coordinates] = grideye_count(data)
     normalizedThresholdValue = 0.95; % In range 0 to 1.
     thresholdValue = normalizedThresholdValue * max(max(originalImage)); % Gray Levels.
     binaryImage = im2bw(originalImage, normalizedThresholdValue);       % One way to threshold to binary
+%     binaryImage = originalImage > thresholdValue;
 
     % Do a "hole fill" to get rid of any background pixels or "holes" inside the blobs.
     binaryImage = imfill(binaryImage, 'holes');
@@ -45,8 +46,8 @@ function [num_people, coordinates] = grideye_count(data)
             % get blob in 32x32 coordinates
             x = blobMeasurements(k).Centroid(1);
 %             y = blobMeasurements(k).Centroid(2);
-% 
-%             % find corresponding pixel val (0<->1) in 32x32 bitmap
+
+            % find corresponding pixel val (0<->1) in 32x32 bitmap
 %             pix_val = data_interp(round(x), round(y));
 
             % map pixel from 0<->1 temp to z-coordinate
@@ -56,7 +57,7 @@ function [num_people, coordinates] = grideye_count(data)
 %             min_z = 0;
 %             z = (pix_val - min_val) * (max_z - min_z) / (max_val - min_val) + min_z;
 
-            % record x-coordinates of a person detected
+            % record coordinates of a person detected
             coordinates(num_people, 1) = round(x / 4); % 32x32 to 8x8
 %             coordinates(num_people, 2) = round(z);
         end
