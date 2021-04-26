@@ -1,7 +1,7 @@
 % use to manually evaluate results of camera
-dataFilename = 'test_data/scenario1_trial1.mat';
-photoFilename = 'test_photos/scenario1_trial1/photo#%d.png';
-resultsFilename = 'test_results/scenario1_trial1.mat';
+dataFilename = 'test_data/scenario3_trial3.mat';
+photoFilename = 'test_photos/scenario3_trial3/photo#%d.png';
+resultsFilename = 'test_results/scenario3_trial3.mat';
 
 % evaluate n measurements
 n = 20;

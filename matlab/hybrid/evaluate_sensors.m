@@ -1,7 +1,7 @@
 % use to manually evaluate results of camera
-dataFilename = 'test_data/scenario1_trial1.mat';
-photoFilename = 'test_photos/scenario1_trial1/photo#%d.png';
-resultsFilename = 'test_results/scenario1_trial1.mat';
+dataFilename = 'test_data/scenario3_trial3.mat';
+photoFilename = 'test_photos/scenario3_trial3/photo#%d.png';
+resultsFilename = 'test_results/scenario3_trial3.mat';
 
 % evaluate n measurements
 n = 20;
@@ -20,6 +20,7 @@ for i=1:n
     
     % print coordinates of people in frame (assume no more than 3 targets max)
     reportedPeople = data(1,i);
+    fprintf("num reported: %d\n", reportedPeople);
     for j=0:2
         fprintf("x-coord: %d, y-coord: %d\n", data(2*j+2, i), data(2*j+3, i));
     end
