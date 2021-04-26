@@ -1,6 +1,6 @@
 % takes n measurements from the mmwave sensor, once every k seconds
-n = 10;
-k = 1;
+n = 20;
+k = .5;
 
 dataPortName = '/dev/ttyUSB4';
 controlPortName = '/dev/ttyUSB3';

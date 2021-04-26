@@ -1,24 +1,46 @@
-% evaluate n measurements
-results = open('test_data/test_camera.mat', 'results')
-n = 0
-good = 0
-miss = 0
-assessments = zeros(1, n)
+% use to manually evaluate results of camera
+dataFilename = 'test_data/scenario1_trial1.mat';
+photoFilename = 'test_photos/scenario1_trial1/photo#%d.png';
+resultsFilename = 'test_results/scenario1_trial1.mat';
 
-% assess each frame
+% evaluate n measurements
+n = 20;
+good = 0; % +1 if correct # of individuals reported on a frame, +0 otherwise
+missed = 0; % +1 if individual missed on a frame, +0 otherwise
+lied = 0; % +1 if individual falsely reported on a frame, +0 otherwise
+totalPeople = 0; % total number of individuals in the scene across all frames
+
+% assess each measurement
+data = importdata(dataFilename);
 for i=1:n
-    zeros(1, i) = 0
+    % show ith image
+    imageFile = sprintf(photoFilename, i);
+    image = imread(imageFile);
+    imshow(image);
     
-    if (results(1, i) == evaluations(1, i))
-        good = good + 1
-    else
-        miss = miss + abs(diff(results(1, i), results(2, i)))
+    numPeople = input('How many people do you see?');
+    if (numPeople == data(i))
+        good = good + 1;
     end
     
-    if (
+    numMissed = input('How many people were missed?');
+    if (numMissed ~= 0)
+        missed = missed + numMissed;
+    end
+    
+    numFalse = input('How many people were falsely reported?');
+    if (numFalse ~= 0)
+        lied = lied + numFalse;
+    end
+    
+    % keep track of total number of people across all frames
+    totalPeople = totalPeople + numPeople;
 end
 
 % compute evaluation rates
-GMR = good / n
-MDR = miss / sum(results(2, :))
-FDR = 0 / sum(
+results = zeros(3, 1);
+results(1) = good / double(n); % # of correct frames / total frames
+results(2) = missed / double(totalPeople); % # of people missed / total number of people across all frames
+results(3) = lied / double(totalPeople); % # of people falsely reported / total number of people across all frames
+
+save(resultsFilename, 'results'); % save results

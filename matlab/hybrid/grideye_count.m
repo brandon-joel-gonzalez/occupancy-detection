@@ -35,7 +35,7 @@ function [num_people, coordinates] = grideye_count(data)
     
     % loop over each blob to count num people and their location
     num_people = 0;
-    coordinates = zeros(numberOfBlobs, 1);
+    coordinates = zeros(3, 1);
     for k = 1 : numberOfBlobs           % Loop through all blobs.
         blobArea = blobMeasurements(k).Area;		% get area
         
@@ -60,6 +60,11 @@ function [num_people, coordinates] = grideye_count(data)
             % record coordinates of a person detected
             coordinates(num_people, 1) = round(x / 4); % 32x32 to 8x8
 %             coordinates(num_people, 2) = round(z);
+
+            % assume no more than 3 targets
+            if num_people == 3
+                break;
+            end
         end
     end
 end

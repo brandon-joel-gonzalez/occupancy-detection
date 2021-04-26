@@ -1189,7 +1189,7 @@ function [sphandle] = configureDataSport(comPortNum, bufferSize)
         delete(instrfind('Type','serial'));  % delete open serial ports.
     end
     comPortString = ['COM' num2str(comPortNum)];
-    sphandle = serial('/dev/ttyUSB1','BaudRate',921600); % hardcoded to '/dev/ttyUSB*'
+    sphandle = serial('/dev/ttyUSB2','BaudRate',921600); % hardcoded to '/dev/ttyUSB*'
     set(sphandle,'Terminator', '');
     set(sphandle,'InputBufferSize', bufferSize);
     set(sphandle,'Timeout',10);
@@ -1203,7 +1203,7 @@ function [sphandle] = configureControlPort(comPortNum)
     %    delete(instrfind('Type','serial'));  % delete open serial ports.
     %end
     comPortString = ['COM' num2str(comPortNum)];
-    sphandle = serial('/dev/ttyUSB0','BaudRate',115200); % hardcoded to '/dev/ttyUSB*'
+    sphandle = serial('/dev/ttyUSB1','BaudRate',115200); % hardcoded to '/dev/ttyUSB*'
     set(sphandle,'Parity','none')    
     set(sphandle,'Terminator','LF')        
     fopen(sphandle);

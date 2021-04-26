@@ -1,7 +1,7 @@
 % function to run camera baseline algorithm
 % takes in frame index
 % returns number of people detected
-function [numPeople] = vision_detector(camera, i)
+function [numPeople] = vision_detector(camera, imageFile)
     % initialize detector
     bodyDetector = vision.CascadeObjectDetector('UpperBody'); 
     bodyDetector.MinSize = [60 60];
@@ -16,7 +16,6 @@ function [numPeople] = vision_detector(camera, i)
     IBody = insertObjectAnnotation(image,'rectangle',bboxBody,'Upper Body');
     
     % save image
-    imageFile = sprintf('test_photos/test_camera#%d.png', i); % save camera image
     imwrite(IBody, imageFile)
     %figure
     %imshow(IBody)

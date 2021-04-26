@@ -79,5 +79,5 @@ void readGrideye() {
   // end print with return
   Serial.println();
   // delay between sends
-  delay(1000);
+  delay(500);
 }

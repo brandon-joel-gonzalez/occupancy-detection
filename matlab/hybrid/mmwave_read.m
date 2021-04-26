@@ -1,5 +1,5 @@
 %main function
-function [numTargets, S] = mmwave_read(hDataSerialPort, hControlSerialPort, Params, scene, wall, cfgData, results, numMeasurements, sampleRate, camera)
+function [returnData] = mmwave_read(hDataSerialPort, hControlSerialPort, Params, scene, wall, cfgData, data, currMeas, numMeas, sampRate, camera, photoFilename)
 %     clear, clc
 
     %% SETUP SELECTIONS
@@ -977,27 +977,36 @@ function [numTargets, S] = mmwave_read(hDataSerialPort, hControlSerialPort, Para
 %             max_bound = 8;
 %             min_bound = 1;
             
-            for i = 1:numTargets
-                fprintf('x: %d, y: %d\n', S(1, i), S(2, i)); % print xy
+            % save and print up to 3 target positions
+            for i = 0:numTargets
+                if i == numTargets
+                    break;
+                end
+                
+                data(2*i+2, currMeas) = S(1, i+1); % save x position of ith person
+                data(2*i+3, currMeas) = S(2, i+1); % save y position of ith person
+                fprintf('person %d, x: %d, y: %d\n', i, data(2*i+2, currMeas), data(2*i+3, currMeas)); % print xy of ith person
             end
+            data(1, currMeas) = numTargets; % targets found on mth frame
             
             % take snapshot
             image = snapshot(camera);
-            imageFile = sprintf('test_photos/test_mmwave#%d.png', numMeasurements); % save camera image
+            imageFile = sprintf(photoFilename, currMeas); % save camera image
             imwrite(image, imageFile);
             
             % see if we're done measuring
-            numMeasurements = numMeasurements - 1;
-            if numMeasurements == 0
+            if currMeas == numMeas
                 break;
             end
             
             % wait for next measurement
-            pause(sampleRate)
+            currMeas = currMeas + 1;
+            fprintf('loop: %d, targets: %d\n', currMeas, numTargets);
+            pause(sampRate);
         end
         
         % see if we're done measuring
-        if numMeasurements == 0
+        if currMeas == numMeas
             break;
         end
 
@@ -1094,6 +1103,8 @@ function [numTargets, S] = mmwave_read(hDataSerialPort, hControlSerialPort, Para
         disp(command);
         fprintf(hControlSerialPort, command);
     end
+
+    returnData = data;
 end
 
 %% Helper functions

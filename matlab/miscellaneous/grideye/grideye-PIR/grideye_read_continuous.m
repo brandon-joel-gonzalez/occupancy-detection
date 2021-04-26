@@ -4,14 +4,14 @@ clear all
 close all
 clc
 
-s = serial('/dev/ttyUSB2'); % change this to desired Arduino board port
+s = serial('/dev/ttyUSB0'); % change this to desired Arduino board port
 set(s,'BaudRate',9600); % baud rate for communication
 fopen(s); % open the comm between Arduino and MATLAB
 
-while s.BytesAvailable == 0
-    % wait for PIR signal
-end
-pause(1) % wait a moment to begin reading grideye data
+% while s.BytesAvailable == 0
+%     % wait for PIR signal
+% end
+% pause(1) % wait a moment to begin reading grideye data
 
 % Sensor noise measurement
 % for this: place a large object with uniform temperature in
